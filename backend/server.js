@@ -14,32 +14,14 @@ mongoose
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.log(err));
 
-// ✅ 주문 스키마 & 모델
-const OrderSchema = new mongoose.Schema({
-  items: Array,
-  totalPrice: Number,
-  status: { type: String, default: "Pending" },
-});
-const Order = mongoose.model("Order", OrderSchema);
+// ✅ Order 모델 임포트
+const Order = require("./models/Order"); // Order 모델을 임포트
 
-// ✅ 주문 생성 (POST)
-app.post("/api/order", async (req, res) => {
-  const { items } = req.body;
-  if (!items || !Array.isArray(items)) {
-    return res
-      .status(400)
-      .json({ message: "유효한 아이템 배열이 필요합니다." });
-  }
-  const order = new Order({ items, totalPrice: 0 });
-  await order.save();
-  res.json({ message: "주문 성공!", order });
-});
+// ✅ 라우터 임포트
+const cartRoutes = require("./cartRoutes"); // cartRoutes 파일 임포트
 
-// ✅ 주문 목록 조회 (GET)
-app.get("/api/orders", async (req, res) => {
-  const orders = await Order.find();
-  res.json(orders);
-});
+// ✅ 라우터 사용
+app.use("/api", cartRoutes); // "/api" 경로로 시작하는 요청에 대해 cartRoutes를 사용
 
 const PORT = process.env.PORT || 5012;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
